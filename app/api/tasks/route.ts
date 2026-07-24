@@ -1,24 +1,8 @@
-import { ensureSchema, getPool } from "@/db";
+import { getPrisma } from "@/db";
 import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-
-export type TaskRow = {
-  id: number;
-  title: string;
-  completed: boolean;
-  created_at: Date;
-};
-
-export function toTask(row: TaskRow) {
-  return {
-    id: row.id,
-    title: row.title,
-    completed: row.completed,
-    createdAt: row.created_at,
-  };
-}
 
 function errorMessage(error: unknown) {
   if (error instanceof Error && error.message.includes("DATABASE_URL")) {
@@ -30,14 +14,11 @@ function errorMessage(error: unknown) {
 
 export async function GET() {
   try {
-    await ensureSchema();
-    const result = await getPool().query<TaskRow>(
-      `SELECT id, title, completed, created_at
-       FROM demo_tasks
-       ORDER BY created_at DESC, id DESC`,
-    );
+    const tasks = await getPrisma().task.findMany({
+      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+    });
 
-    return NextResponse.json(result.rows.map(toTask));
+    return NextResponse.json(tasks);
   } catch (error) {
     console.error("GET /api/tasks failed", error);
     return NextResponse.json({ error: errorMessage(error) }, { status: 503 });
@@ -63,15 +44,11 @@ export async function POST(request: Request) {
       );
     }
 
-    await ensureSchema();
-    const result = await getPool().query<TaskRow>(
-      `INSERT INTO demo_tasks (title)
-       VALUES ($1)
-       RETURNING id, title, completed, created_at`,
-      [title],
-    );
+    const task = await getPrisma().task.create({
+      data: { title },
+    });
 
-    return NextResponse.json(toTask(result.rows[0]), { status: 201 });
+    return NextResponse.json(task, { status: 201 });
   } catch (error) {
     console.error("POST /api/tasks failed", error);
     return NextResponse.json({ error: errorMessage(error) }, { status: 503 });

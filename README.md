@@ -1,7 +1,8 @@
 # Local Postgres Lab
 
-A small Next.js app for learning how frontend actions become PostgreSQL rows.
-It uses local PostgreSQL only—no hosted database or cloud account.
+A small Next.js app for learning how frontend actions become PostgreSQL rows
+through Prisma ORM. It uses local PostgreSQL only—no hosted database or cloud
+account.
 
 ## What you can try
 
@@ -9,8 +10,7 @@ It uses local PostgreSQL only—no hosted database or cloud account.
 - `POST /api/tasks` inserts a task.
 - `PATCH /api/tasks/:id` toggles its completed state.
 - `DELETE /api/tasks/:id` removes it.
-- Every query is parameterized, and the table is created automatically on the
-  first successful API request.
+- Every database operation uses the generated, type-safe Prisma Client.
 
 ## 1. Start PostgreSQL
 
@@ -55,10 +55,12 @@ DATABASE_URL=postgresql://postgres:postgres@localhost:5432/backend_demo
 
 Do not commit `.env.local`; it contains your database password.
 
-## 3. Run Next.js
+## 3. Prepare the database and run Next.js
 
 ```powershell
 npm install
+npm run db:generate
+npm run db:push
 npm run dev
 ```
 
@@ -68,15 +70,22 @@ green after the app connects.
 ## Code map
 
 - `app/database-playground.tsx` — React UI and `fetch` calls.
-- `app/api/tasks/route.ts` — list and create handlers.
-- `app/api/tasks/[id]/route.ts` — update and delete handlers.
-- `db/index.ts` — PostgreSQL pool and automatic schema setup.
-- `db/schema.sql` — the table definition in plain SQL.
+- `app/api/tasks/route.ts` — Prisma list and create handlers.
+- `app/api/tasks/[id]/route.ts` — Prisma update and delete handlers.
+- `db/index.ts` — shared Prisma Client with the PostgreSQL adapter.
+- `prisma/schema.prisma` — the type-safe database model.
+- `prisma.config.ts` — Prisma CLI configuration.
 - `compose.yml` — optional local PostgreSQL container.
 
 ## Inspect the saved data
 
-Use pgAdmin's Query Tool or `psql`:
+Open Prisma Studio:
+
+```powershell
+npm run db:studio
+```
+
+You can also use pgAdmin's Query Tool or `psql`:
 
 ```sql
 SELECT * FROM demo_tasks ORDER BY created_at DESC;

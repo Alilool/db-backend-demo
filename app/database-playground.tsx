@@ -35,7 +35,6 @@ export function DatabasePlayground() {
     fetch("/api/tasks", { cache: "no-store" })
       .then(async (response) => {
         const body = (await response.json()) as Task[] | ApiError;
-        console.log("Fetched tasks:", body);
         if (!response.ok) {
           throw new Error(
             "error" in body ? body.error : "Could not load tasks.",
@@ -44,7 +43,6 @@ export function DatabasePlayground() {
         return body as Task[];
       })
       .then((savedTasks) => {
-        console.log("Saved tasks:", savedTasks);
         if (active) setTasks(savedTasks);
       })
       .catch((requestError: unknown) => {
@@ -300,7 +298,7 @@ export function DatabasePlayground() {
               <li className="flow-step">
                 <span className="step-number">03</span>
                 <span>
-                  <strong>SQL query</strong>A parameterized query reaches
+                  <strong>Prisma Client</strong>A typed Prisma query reaches
                   PostgreSQL.
                 </span>
               </li>
@@ -315,10 +313,10 @@ export function DatabasePlayground() {
           </div>
 
           <div className="query-card">
-            <div className="query-label">What the API runs</div>
-            <pre>{`INSERT INTO demo_tasks (title)
-VALUES ($1)
-RETURNING *;`}</pre>
+            <div className="query-label">What the API calls</div>
+            <pre>{`prisma.task.create({
+  data: { title }
+});`}</pre>
           </div>
         </aside>
       </section>

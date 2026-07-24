@@ -1,11 +1,13 @@
-import { Pool } from "pg";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { PrismaClient } from "@/app/generated/prisma/client";
 
-declare global {
-  // Reuse the pool during Next.js hot reloads in development.
-  var postgresPool: Pool | undefined;
-}
+const globalForPrisma = globalThis as unknown as {
+  prisma: PrismaClient | undefined;
+};
 
-function getConnectionString() {
+let prisma = globalForPrisma.prisma;
+
+function createPrismaClient() {
   const connectionString = process.env.DATABASE_URL;
 
   if (!connectionString) {
@@ -14,37 +16,17 @@ function getConnectionString() {
     );
   }
 
-  return connectionString;
+  return new PrismaClient({
+    adapter: new PrismaPg({ connectionString }),
+  });
 }
 
-export function getPool() {
-  if (!global.postgresPool) {
-    global.postgresPool = new Pool({
-      connectionString: getConnectionString(),
-      max: 10,
-    });
+export function getPrisma() {
+  prisma ??= createPrismaClient();
+
+  if (process.env.NODE_ENV !== "production") {
+    globalForPrisma.prisma = prisma;
   }
 
-  return global.postgresPool;
-}
-
-let schemaReady: Promise<void> | undefined;
-
-export async function ensureSchema() {
-  schemaReady ??= getPool()
-    .query(`
-      CREATE TABLE IF NOT EXISTS demo_tasks (
-        id SERIAL PRIMARY KEY,
-        title VARCHAR(160) NOT NULL CHECK (char_length(trim(title)) > 0),
-        completed BOOLEAN NOT NULL DEFAULT FALSE,
-        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-      )
-    `)
-    .then(() => undefined)
-    .catch((error) => {
-      schemaReady = undefined;
-      throw error;
-    });
-
-  return schemaReady;
+  return prisma;
 }

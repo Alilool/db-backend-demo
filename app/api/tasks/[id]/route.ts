@@ -1,6 +1,5 @@
-import { ensureSchema, getPool } from "@/db";
+import { getPrisma } from "@/db";
 import { NextResponse } from "next/server";
-import { toTask, type TaskRow } from "@/app/api/tasks/route";
 
 export const runtime = "nodejs";
 
@@ -23,6 +22,15 @@ function databaseError() {
   );
 }
 
+function isNotFoundError(error: unknown) {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    error.code === "P2025"
+  );
+}
+
 export async function PATCH(request: Request, context: RouteContext) {
   try {
     const id = parseId((await context.params).id);
@@ -38,21 +46,17 @@ export async function PATCH(request: Request, context: RouteContext) {
       );
     }
 
-    await ensureSchema();
-    const result = await getPool().query<TaskRow>(
-      `UPDATE demo_tasks
-       SET completed = $1
-       WHERE id = $2
-       RETURNING id, title, completed, created_at`,
-      [body.completed, id],
-    );
+    const task = await getPrisma().task.update({
+      where: { id },
+      data: { completed: body.completed },
+    });
 
-    if (result.rowCount === 0) {
+    return NextResponse.json(task);
+  } catch (error) {
+    if (isNotFoundError(error)) {
       return NextResponse.json({ error: "Task not found." }, { status: 404 });
     }
 
-    return NextResponse.json(toTask(result.rows[0]));
-  } catch (error) {
     console.error("PATCH /api/tasks/:id failed", error);
     return databaseError();
   }
@@ -65,18 +69,14 @@ export async function DELETE(_request: Request, context: RouteContext) {
       return NextResponse.json({ error: "Invalid task id." }, { status: 400 });
     }
 
-    await ensureSchema();
-    const result = await getPool().query(
-      "DELETE FROM demo_tasks WHERE id = $1",
-      [id],
-    );
-
-    if (result.rowCount === 0) {
-      return NextResponse.json({ error: "Task not found." }, { status: 404 });
-    }
+    await getPrisma().task.delete({ where: { id } });
 
     return NextResponse.json({ ok: true });
   } catch (error) {
+    if (isNotFoundError(error)) {
+      return NextResponse.json({ error: "Task not found." }, { status: 404 });
+    }
+
     console.error("DELETE /api/tasks/:id failed", error);
     return databaseError();
   }
