@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS demo_tasks (
+  id SERIAL PRIMARY KEY,
+  title VARCHAR(160) NOT NULL CHECK (char_length(trim(title)) > 0),
+  completed BOOLEAN NOT NULL DEFAULT FALSE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
