@@ -9,7 +9,7 @@ const DUMMY_PASSWORD_HASH =
 export const { auth, handlers, signIn, signOut } = NextAuth({
   // AUTH_SECRET is the production name. The fallback supports secrets created
   // by the locally installed auth CLI without exposing either value.
-  secret: process.env.AUTH_SECRET ?? process.env.BETTER_AUTH_SECRET,
+  secret: process.env.BETTER_AUTH_SECRET,
   trustHost: true,
   pages: {
     signIn: "/login",
