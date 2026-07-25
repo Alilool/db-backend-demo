@@ -12,7 +12,7 @@
 .agents/*
 .claude/*
 .windsurf/*
-.scripts/*
+
 
 # testing
 /coverage
@@ -49,3 +49,4 @@ next-env.d.ts
 /work/
 
 /app/generated/prisma
+.scripts/*

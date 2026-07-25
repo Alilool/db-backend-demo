@@ -21,9 +21,7 @@ async function main() {
   }
 
   if (!password || password.length < 12 || password.length > 128) {
-    throw new Error(
-      "ADMIN_PASSWORD must be between 12 and 128 characters.",
-    );
+    throw new Error("ADMIN_PASSWORD must be between 12 and 128 characters.");
   }
 
   const prisma = new PrismaClient({
