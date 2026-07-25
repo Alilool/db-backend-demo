@@ -1,4 +1,5 @@
 import { getPrisma } from "@/db";
+import { auth } from "@/auth";
 import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
@@ -13,6 +14,11 @@ function errorMessage(error: unknown) {
 }
 
 export async function GET() {
+  const session = await auth();
+  if (!session?.user) {
+    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+  }
+
   try {
     const tasks = await getPrisma().task.findMany({
       orderBy: [{ createdAt: "desc" }, { id: "desc" }],
@@ -26,6 +32,11 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const session = await auth();
+  if (!session?.user) {
+    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+  }
+
   try {
     const body = (await request.json()) as { title?: unknown };
     const title = typeof body.title === "string" ? body.title.trim() : "";

@@ -51,29 +51,63 @@ The example contains:
 
 ```text
 DATABASE_URL=postgresql://postgres:postgres@localhost:5432/backend_demo
+DIRECT_URL=postgresql://postgres:postgres@localhost:5432/backend_demo
 ```
 
 Do not commit `.env.local`; it contains your database password.
+For hosted serverless PostgreSQL, use its pooled URL as `DATABASE_URL` and its
+direct URL as `DIRECT_URL` so Prisma migrations do not run through the pooler.
 
 ## 3. Prepare the database and run Next.js
 
 ```powershell
 npm install
 npm run db:generate
-npm run db:push
+npm run db:migrate
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000). The status pill will turn
 green after the app connects.
 
+## Create the login user
+
+Add these values to `.env.local` temporarily:
+
+```text
+ADMIN_EMAIL=you@example.com
+ADMIN_PASSWORD=use-a-strong-password-here
+ADMIN_NAME=Your Name
+```
+
+Then create or update the user:
+
+```powershell
+npm run auth:create-user
+```
+
+The command hashes the password with bcrypt using 12 rounds before saving it.
+Only the hash is stored in PostgreSQL. Remove `ADMIN_PASSWORD` from
+`.env.local` after the command succeeds.
+
+Auth.js also requires a random `AUTH_SECRET` of at least 32 characters. Generate
+one with Node.js, put the result in `.env.local`, and add the same variable to
+Vercel's environment settings:
+
+```powershell
+node -e "console.log(require('node:crypto').randomBytes(32).toString('base64url'))"
+```
+
 ## Code map
 
 - `app/database-playground.tsx` — React UI and `fetch` calls.
 - `app/api/tasks/route.ts` — Prisma list and create handlers.
 - `app/api/tasks/[id]/route.ts` — Prisma update and delete handlers.
+- `app/login/page.tsx` — custom credentials login page.
+- `auth.ts` — Auth.js configuration and bcrypt password verification.
 - `db/index.ts` — shared Prisma Client with the PostgreSQL adapter.
 - `prisma/schema.prisma` — the type-safe database model.
+- `scripts/create-admin.ts` — one-time bcrypt user creation and password reset.
 - `prisma.config.ts` — Prisma CLI configuration.
 - `compose.yml` — optional local PostgreSQL container.
 

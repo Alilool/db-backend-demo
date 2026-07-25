@@ -20,7 +20,15 @@ function formatTime(date: string) {
   }).format(new Date(date));
 }
 
-export function DatabasePlayground() {
+type DatabasePlaygroundProps = {
+  signOutAction: () => Promise<void>;
+  userEmail: string;
+};
+
+export function DatabasePlayground({
+  signOutAction,
+  userEmail,
+}: DatabasePlaygroundProps) {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [title, setTitle] = useState("");
   const [loading, setLoading] = useState(true);
@@ -165,7 +173,16 @@ export function DatabasePlayground() {
           <span className="brand-mark">DB</span>
           Local Postgres Lab
         </div>
-        <span className="local-pill">Runs on your machine</span>
+        <div className="account-actions">
+          <span className="account-email" title={userEmail}>
+            {userEmail}
+          </span>
+          <form action={signOutAction}>
+            <button className="sign-out-button" type="submit">
+              Sign out
+            </button>
+          </form>
+        </div>
       </nav>
 
       <section className="hero">

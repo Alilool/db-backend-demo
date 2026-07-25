@@ -1,4 +1,5 @@
 import { getPrisma } from "@/db";
+import { auth } from "@/auth";
 import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
@@ -32,6 +33,11 @@ function isNotFoundError(error: unknown) {
 }
 
 export async function PATCH(request: Request, context: RouteContext) {
+  const session = await auth();
+  if (!session?.user) {
+    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+  }
+
   try {
     const id = parseId((await context.params).id);
     if (!id) {
@@ -63,6 +69,11 @@ export async function PATCH(request: Request, context: RouteContext) {
 }
 
 export async function DELETE(_request: Request, context: RouteContext) {
+  const session = await auth();
+  if (!session?.user) {
+    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+  }
+
   try {
     const id = parseId((await context.params).id);
     if (!id) {

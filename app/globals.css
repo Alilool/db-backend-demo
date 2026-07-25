@@ -435,6 +435,140 @@ h1 {
   font-size: 13px;
 }
 
+.account-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.account-email {
+  max-width: 240px;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sign-out-button {
+  min-height: 34px;
+  padding: 0 13px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 253, 248, 0.72);
+  color: var(--green-dark);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.sign-out-button:hover {
+  border-color: rgba(30, 103, 67, 0.45);
+  background: white;
+}
+
+.login-shell {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: 32px 16px;
+}
+
+.login-card {
+  width: min(100%, 440px);
+  padding: 34px;
+  border: 1px solid rgba(220, 216, 203, 0.9);
+  border-radius: 26px;
+  background: rgba(255, 253, 248, 0.92);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(16px);
+}
+
+.login-brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-bottom: 42px;
+  font-weight: 720;
+  letter-spacing: -0.03em;
+}
+
+.login-heading {
+  margin-bottom: 28px;
+}
+
+.login-heading h1 {
+  margin-bottom: 14px;
+  font-size: clamp(40px, 10vw, 54px);
+}
+
+.login-heading p:last-child {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.login-form {
+  display: grid;
+  gap: 18px;
+}
+
+.login-form label {
+  display: grid;
+  gap: 8px;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.login-form input {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  outline: 0;
+  background: white;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.login-form input:focus {
+  border-color: rgba(30, 103, 67, 0.58);
+  box-shadow: 0 0 0 4px rgba(30, 103, 67, 0.08);
+}
+
+.login-error {
+  margin: -4px 0 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(239, 115, 94, 0.36);
+  border-radius: 10px;
+  background: rgba(239, 115, 94, 0.09);
+  color: #9a3f31;
+  font-size: 13px;
+}
+
+.login-button {
+  min-height: 48px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--green);
+  color: white;
+  font-weight: 750;
+}
+
+.login-button:hover {
+  background: var(--green-dark);
+}
+
+.login-footnote {
+  margin: 22px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
+}
+
 @media (max-width: 850px) {
   .hero,
   .workspace {
@@ -461,9 +595,8 @@ h1 {
     margin-bottom: 38px;
   }
 
-  .local-pill {
-    padding: 0 10px;
-    font-size: 11px;
+  .account-email {
+    display: none;
   }
 
   h1 {
@@ -481,5 +614,9 @@ h1 {
 
   .primary-button {
     min-height: 43px;
+  }
+
+  .login-card {
+    padding: 26px 22px;
   }
 }
