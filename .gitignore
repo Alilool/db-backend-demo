@@ -49,4 +49,3 @@ next-env.d.ts
 /work/
 
 /app/generated/prisma
-/scripts/create-admin.ts
